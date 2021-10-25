@@ -2,12 +2,29 @@
 h2 Login component
 ui-form(class="login-form")
 	div
-		ui-textfield(class="mt-20 input") email address
-		ui-textfield(class="mt-20 input") password
-	ui-button(class="mt-20" raised) Войти
+		ui-textfield(class="mt-20 input" v-model="email") email address
+		ui-textfield(class="mt-20 input" v-model="password" input-type="password" ) password
+	ui-button(class="mt-20" raised @click="login") Войти
 </template>
 
-<script></script>
+<script setup lang="ts">
+	import { useStore } from 'vuex'
+	import { ref } from 'vue'
+	import { useRouter } from 'vue-router'
+
+	const store = useStore()
+	const router = useRouter()
+
+	const email = ref('')
+	const password = ref('')
+
+	function login() {
+		const user = { email: email.value.trim(), password: password.value.trim() }
+		store.dispatch('login', user).then(() => {
+			if (store.getters.isLoggedIn) router.push('/')
+		})
+	}
+</script>
 
 <style scoped lang="scss">
 	.login-form {

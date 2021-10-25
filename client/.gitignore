@@ -5,3 +5,7 @@ dist-ssr
 *.local
 .idea
 .vscode
+
+# local env files
+.env
+.env.*.local

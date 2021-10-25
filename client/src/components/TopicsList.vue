@@ -35,7 +35,7 @@ div(class="topics-list-container")
 
 	.filter-bar {
 		height: 50px;
-		border: 1px dotted white;
+		//border: 1px dotted white;
 		position: sticky;
 		top: 0;
 		background-color: lightskyblue;
@@ -44,11 +44,11 @@ div(class="topics-list-container")
 	}
 
 	.topics-content {
-		border: 1px dotted white;
+		//border: 1px dotted white;
 	}
 
 	.topic {
-		border: 1px dotted white;
+		//border: 1px dotted white;
 		border-radius: 10px 0 10px 10px;
 		height: 100px;
 		margin: 10px;
