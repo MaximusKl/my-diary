@@ -16,7 +16,7 @@ apiClient.interceptors.request.use(
 			if (config.headers) {
 				config.headers['Authorization'] = `Bearer ${token}`
 			} else {
-				config.headers = { Authorization: token }
+				config.headers = { Authorization: `Bearer ${token}` }
 			}
 		}
 		return config

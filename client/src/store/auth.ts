@@ -26,12 +26,12 @@ export default {
 				// })
 				const res = await apiClient.post('/auth/login', JSON.stringify(user))
 				if (res.status >= 200 && res.status < 300) {
-					const result = await res.data
-					console.log(`Result: ${result.token}`)
+					const result = res.data
+					// console.log(`Result: ${result.token}`)
 					commit('setToken', result.token)
 				} else {
 					console.log(`Error: ${res.status}`)
-					const result = await res.data
+					const result = res.data
 					console.log(`Error: ${result.message}`)
 				}
 			} catch (e) {

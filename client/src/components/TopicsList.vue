@@ -3,13 +3,19 @@ div(class="topics-list-container")
 	div(class="topics-list-wrapper")
 		div(class="filter-bar")
 		div(class="topics-content")
-			div(class="topic" v-for="i in 15")
+			topic(v-for="i in store.getters['topics']" key="i._id" :date="new Date(i.created)" :content="i.content" :tags="i.tags")
 </template>
 
-<script>
-	export default {
-		name: 'TopicsList',
-	}
+<script setup lang="ts">
+	import Topic from '../components/Topic.vue'
+	import { onMounted } from 'vue'
+	import { useStore } from 'vuex'
+
+	const store = useStore()
+
+	onMounted(() => {
+		store.dispatch('loadTopics')
+	})
 </script>
 
 <style scoped lang="scss">
@@ -41,18 +47,5 @@ div(class="topics-list-container")
 		background-color: lightskyblue;
 		opacity: 1;
 		z-index: 1;
-	}
-
-	.topics-content {
-		//border: 1px dotted white;
-	}
-
-	.topic {
-		//border: 1px dotted white;
-		border-radius: 10px 0 10px 10px;
-		height: 100px;
-		margin: 10px;
-		background-color: lightskyblue;
-		opacity: 0.7;
 	}
 </style>
