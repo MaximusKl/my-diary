@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
+import router from '../router'
 
 const apiClient: AxiosInstance = axios.create({
 	baseURL: import.meta.env.VITE_API_URL as string,
@@ -22,6 +23,18 @@ apiClient.interceptors.request.use(
 		return config
 	},
 	error => {
+		return Promise.reject(error)
+	}
+)
+
+apiClient.interceptors.response.use(
+	response => {
+		if (response.status === 401) {
+			router.push('/login')
+		}
+		return response
+	},
+	function (error) {
 		return Promise.reject(error)
 	}
 )

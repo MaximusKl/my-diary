@@ -17,13 +17,6 @@ export default {
 	actions: {
 		async login({ commit }, user) {
 			try {
-				// const url = import.meta.env.VITE_API_URL
-				// console.log(url)
-				// const res = await fetch(`${url}/auth/login`, {
-				// 	method: 'POST',
-				// 	headers: { 'Content-Type': 'application/json;charset=utf-8' },
-				// 	body: JSON.stringify(user),
-				// })
 				const res = await apiClient.post('/auth/login', JSON.stringify(user))
 				if (res.status >= 200 && res.status < 300) {
 					const result = res.data
