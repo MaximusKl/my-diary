@@ -20,7 +20,7 @@ module.exports.login = async function (req, res) {
 				},
 				keys.jwt,
 				{
-					expiresIn: 60 * 60,
+					expiresIn: 60 * 60 * 24,
 				}
 			)
 

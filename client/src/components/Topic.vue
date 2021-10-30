@@ -1,7 +1,7 @@
 <template lang="pug">
 div(class="container")
 	div(class="date") {{ dateFormatted }}
-	div(class="content") {{ content }}
+	div(class="content" v-html="content" )
 	//div(class="tags") {{ tags }}
 	ui-chips(:chips="tags" class="tags")
 		ui-chip(v-for="item in tags" key="item" class="tag") {{ item }}
@@ -36,22 +36,31 @@ div(class="container")
 </script>
 
 <style scoped lang="scss">
+	//$bubble-editor-height: 10px;
+
 	.container {
 		border-radius: 10px 0 10px 10px;
 		//height: 100px;
 		margin: 10px;
 		background-color: lightskyblue;
-		opacity: 0.7;
+		opacity: 0.9;
 	}
 
 	.date {
 		font-size: 1.5em;
 		padding-top: 10px;
+		text-align: center;
 	}
 
 	.content {
-		text-align: left;
+		//text-align: left;
 		padding: 10px 20px;
+		border: none;
+		background-color: aliceblue;
+		margin: 5px 10px;
+		overflow-y: auto;
+		max-height: 100px;
+		border-radius: 5px;
 	}
 
 	.tags {

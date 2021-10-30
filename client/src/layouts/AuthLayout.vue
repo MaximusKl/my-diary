@@ -10,5 +10,6 @@ div(class="container")
 		background-color: #707070;
 		width: 100vw;
 		height: 100vh;
+		text-align: center;
 	}
 </style>

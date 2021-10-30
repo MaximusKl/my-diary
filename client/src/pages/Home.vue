@@ -2,12 +2,8 @@
 topics-list
 </template>
 
-<script>
+<script setup lang="ts">
 	import TopicsList from '../components/TopicsList.vue'
-
-	export default {
-		components: { TopicsList },
-	}
 </script>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

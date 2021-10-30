@@ -10,7 +10,7 @@ const recordSchema = new Schema({
 	aType: {
 		ref: 'record-types',
 		type: Schema.Types.ObjectId,
-		required: true,
+		// required: true,
 	},
 	content: {
 		type: String,

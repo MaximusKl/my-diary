@@ -18,7 +18,7 @@ component(:is="layout")
 		font-family: Roboto, Avenir, Helvetica, Arial, sans-serif;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
-		text-align: center;
+		//text-align: center;
 		/*color: #2c3e50;*/
 		/*margin-top: 60px;*/
 		margin: 0;
@@ -39,5 +39,6 @@ component(:is="layout")
 		width: 100%;
 		line-height: 50px;
 		z-index: 1;
+		text-align: center;
 	}
 </style>

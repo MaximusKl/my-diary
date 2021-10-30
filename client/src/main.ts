@@ -28,5 +28,5 @@ app.component(
 app.use(store)
 app.use(router)
 app.use(BalmUI)
-app.use(BalmUIPlus)
+app.use(BalmUIPlus, { UiEditor: {} })
 app.mount('#app')
