@@ -12,14 +12,11 @@ export default {
 			state.topics.unshift(topic)
 		},
 		removeTopic(state, id) {
-			// state.topics = state.topics.filter(topic => topic._id !== id)
-			console.log('Id to remove: ' + id)
-			const ind = state.topics.findIndex(topic => topic._id === id)
-			if (ind >= 0) {
-				console.log('Remove index: ' + ind)
-				state.topics.splice(ind, 1)
-			}
-			console.log('Topics: ' + JSON.stringify(state.topics))
+			state.topics = state.topics.filter(topic => topic._id !== id)
+			// const ind = state.topics.findIndex(topic => topic._id === id)
+			// if (ind >= 0) {
+			// 	state.topics.splice(ind, 1)
+			// }
 		},
 	},
 	actions: {
@@ -55,14 +52,13 @@ export default {
 				console.log(e)
 			}
 		},
-		async removeTopic({ dispatch }, id) {
+		async removeTopic({ commit }, id) {
 			try {
 				const res = await apiClient.delete(`/record/${id}`)
 				if (res.status >= 200 && res.status < 300) {
 					// const result = res.data
 					// console.log(`Result: ${JSON.stringify(result)}`)
-					// commit('removeTopic', id)
-					await dispatch('loadTopics')
+					commit('removeTopic', id)
 				} else {
 					console.log(`Error: ${res.status}`)
 					const result = res.data
