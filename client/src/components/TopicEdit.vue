@@ -6,7 +6,7 @@ div(id="modal-mask")
 		div(id="topic-content")
 			ui-editor(:options='{scrollingContainer: "#topic-content"}' placeholder="Напиши что-нибудь..." :toolbar="toolbar" v-model="content" )
 		div(id="topic-tags")
-			ui-textfield(class="input" placeholder="тэг" v-model="chip" @keypress.enter="addChip")
+			ui-textfield(class="input" v-model="chip" @keypress.enter="addChip" placeholder="введите название метки")
 			ui-chips(:chips="tagsRef" type="input")
 				ui-chip(v-for="item in tagsRef" key="item" class="tag") {{ item }}
 		div(id="btn-group")
@@ -78,7 +78,7 @@ div(id="modal-mask")
 	const store = useStore()
 
 	const addTopic = () => {
-		if (props.content.trim().length && props.tags.length) {
+		if (props.content.trim().length) {
 			const topic = {
 				// aType: '',
 				content: props.content,
@@ -138,9 +138,6 @@ div(id="modal-mask")
 	}
 
 	#topic-tags {
-		input {
-			width: 100%;
-		}
 	}
 
 	#btn-group {

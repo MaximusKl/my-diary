@@ -86,7 +86,7 @@ module.exports.update = async function (req, res) {
 
 module.exports.remove = async function (req, res) {
 	try {
-		await Record.remove({ _id: req.params.id })
+		await Record.deleteOne({ _id: req.params.id })
 		res.status(200).json({ message: 'Record has been deleted' })
 	} catch (e) {
 		errorHandler(res, e)
