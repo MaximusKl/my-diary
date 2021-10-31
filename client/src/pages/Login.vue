@@ -2,8 +2,8 @@
 h2 Login component
 ui-form(class="login-form")
 	div
-		ui-textfield(class="mt-20 input" v-model="email") email address
-		ui-textfield(class="mt-20 input" v-model="password" input-type="password" ) password
+		ui-textfield(class="mt-20 input" v-model="email" @keypress.enter="login") email address
+		ui-textfield(class="mt-20 input" v-model="password" input-type="password" @keypress.enter="login") password
 	ui-button(class="mt-20" raised @click="login") Войти
 </template>
 
@@ -19,7 +19,7 @@ ui-form(class="login-form")
 	const password = ref('')
 
 	function login() {
-		const user = { email: email.value.trim(), password: password.value.trim() }
+		const user = { email: email.value.trim(), password: password.value.trim() } // TODO сделать валиидацию
 		store.dispatch('login', user).then(() => {
 			if (store.getters.isLoggedIn) router.push('/')
 		})

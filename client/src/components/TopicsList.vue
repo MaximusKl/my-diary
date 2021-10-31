@@ -1,11 +1,18 @@
 <template lang="pug">
 div(class="topics-list-container")
-	div(class="topics-list-wrapper")
+	div(class="topics-list-wrapper" v-if="!isLoading")
 		div(class="filter-bar")
-		div(class="topics-content" v-if="!isLoading")
+			ui-select(id="topics-type-select" v-model="currentTopicType" :options="getTypesOptions()" outlined) Тип записи
+			ui-textfield(id="topics-tags-filter" v-model="filterTags" outlined with-trailing-icon) Метка
+				template(#after)
+					ui-textfield-icon(v-if="filterTags" @click="cleanTagsFilter()" trailing) close
+			ui-datepicker(id="topics-range-filter" v-model="dateRange" :label="'Выбор дат'" :config="dateRangeOptions" @update:modelValue="dateRangeChange" outlined with-trailing-icon)
+				template(#after)
+					ui-textfield-icon(v-if="thereIsDateRange()" @click="dateRangeClean()" trailing) close
+		div(class="topics-content")
 			topic(v-for="i in topics" key="i._id" :date="new Date(i.created)" :content="i.content" :tags="i.tags" :id="i._id" :a-type="i.aType || ''" @remove="removeTopic" @edit="editTopic")
-		div(class="spinner-container" v-else)
-			spinner
+	div(class="spinner-container" v-else)
+		spinner
 ui-fab(class="float-btn" @click="addTopic")
 	ui-icon(class="black") add
 topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true" :content="topicContent" :tags='topicTags' :action="modalAction" :id="topicId" :a-type="topicType || ''")
@@ -14,9 +21,10 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 <script setup lang="ts">
 	import TopicEdit from '../components/TopicEdit.vue'
 	import Topic from '../components/Topic.vue'
+	import Spinner from './spinner.vue'
 	import { computed, onMounted, ref } from 'vue'
 	import { useStore } from 'vuex'
-	import Spinner from './spinner.vue'
+	import { Russian } from 'flatpickr/dist/l10n/ru.js'
 
 	const store = useStore()
 
@@ -83,11 +91,48 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 			console.log('Topic not found')
 		}
 	}
+
+	let currentTopicType = ref('')
+
+	const getTypesOptions = () => {
+		const types = store.getters.topicsTypes.map(topicType => {
+			return { label: topicType.localizedName, value: topicType._id }
+		})
+		return [{ label: 'Все', value: -1 }, ...types]
+	}
+
+	const filterTags = ref('')
+
+	const cleanTagsFilter = () => {
+		filterTags.value = ''
+	}
+
+	let dateRange = ref([''])
+
+	const dateRangeOptions = {
+		dateFormat: 'd-m-Y',
+		maxDate: Date.now(),
+		locale: Russian,
+		mode: 'range',
+		position: 'auto center',
+	}
+
+	const thereIsDateRange = () => {
+		return dateRange.value[0].length > 0
+	}
+
+	const dateRangeClean = () => {
+		dateRange.value = ['', '']
+		console.log('Date changed 2: ', dateRange.value)
+	}
+
+	const dateRangeChange = data => {
+		console.log('Date changed: ', data)
+		console.log('Date changed 2: ', dateRange.value)
+	}
 </script>
 
 <style scoped lang="scss">
-	//@use './node_modules/@material/circular-progress' with ($color: white);
-
 	.topics-list-container {
 		position: relative;
 		top: 0;
@@ -104,15 +149,6 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 		position: relative;
 		left: 50%;
 		transform: translateX(-50%);
-	}
-
-	.filter-bar {
-		height: 50px;
-		position: sticky;
-		top: 0;
-		background-color: lightskyblue;
-		opacity: 1;
-		z-index: 1;
 	}
 
 	.spinner-container {
@@ -138,5 +174,35 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 
 	.black {
 		color: black;
+	}
+
+	.filter-bar {
+		//height: 80px;
+		padding: 5px 0;
+		position: sticky;
+		top: 0;
+		background-color: lightskyblue;
+		opacity: 1;
+		z-index: 1;
+		display: flex;
+		align-items: center;
+		justify-content: space-around;
+		flex-wrap: wrap;
+		border-radius: 5px;
+	}
+
+	#topics-type-select {
+		width: 120px;
+		margin: 5px;
+	}
+
+	#topics-tags-filter {
+		width: 180px;
+		margin: 5px;
+	}
+
+	#topics-range-filter {
+		width: 280px;
+		margin: 5px;
 	}
 </style>

@@ -8,7 +8,7 @@ div(class="loader")
 	.loader {
 		color: lightskyblue;
 		font-size: 20px;
-		margin: 100px auto;
+		//margin: 100px auto;
 		width: 1em;
 		height: 1em;
 		border-radius: 50%;
