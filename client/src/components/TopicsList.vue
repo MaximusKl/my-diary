@@ -4,16 +4,19 @@ div(class="topics-list-container")
 		div(class="filter-bar")
 		div(class="topics-content" v-if="!isLoading")
 			topic(v-for="i in topics" key="i._id" :date="new Date(i.created)" :content="i.content" :tags="i.tags" :id="i._id" :a-type="i.aType || ''" @remove="removeTopic" @edit="editTopic")
+		div(class="spinner-container" v-else)
+			spinner
 ui-fab(class="float-btn" @click="addTopic")
 	ui-icon(class="black") add
 topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true" :content="topicContent" :tags='topicTags' :action="modalAction" :id="topicId" :a-type="topicType || ''")
 </template>
 
 <script setup lang="ts">
-	import Topic from '../components/Topic.vue'
 	import TopicEdit from '../components/TopicEdit.vue'
+	import Topic from '../components/Topic.vue'
 	import { computed, onMounted, ref } from 'vue'
 	import { useStore } from 'vuex'
+	import Spinner from './spinner.vue'
 
 	const store = useStore()
 
@@ -83,6 +86,8 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 </script>
 
 <style scoped lang="scss">
+	//@use './node_modules/@material/circular-progress' with ($color: white);
+
 	.topics-list-container {
 		position: relative;
 		top: 0;
@@ -108,6 +113,19 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 		background-color: lightskyblue;
 		opacity: 1;
 		z-index: 1;
+	}
+
+	.spinner-container {
+		width: 100%;
+		height: 100%;
+		position: fixed;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		$color: white;
 	}
 
 	.float-btn {
