@@ -5,7 +5,7 @@ div(id="modal-mask")
 		div(id="topic-type")
 			ui-select(id="topic-type-select" v-model="currentTopicType" :options="getTypesOptions()" outlined) Тип записи
 		div(id="topic-content")
-			ui-editor(:options='{scrollingContainer: "#topic-content"}' placeholder="Напиши что-нибудь..." :toolbar="toolbar" v-model="content" )
+			ui-editor(placeholder="Напиши что-нибудь..." :toolbar="toolbar" v-model="contentRef")
 		div(id="topic-tags")
 			ui-textfield(class="input" v-model="chip" @keypress.enter="addChip" placeholder="название метки")
 			ui-chips(:chips="tagsRef" type="input")
@@ -32,12 +32,12 @@ div(id="modal-mask")
 	const store = useStore()
 
 	const toolbar = [
-		[{ header: [false, 1, 2, 3, 4, 5, 6] }, { font: [] }, { size: [] }],
-		['bold', 'italic', 'underline', { color: [] }, { background: [] }],
+		[{ header: [false, 1, 2, 3, 4, 5, 6] }],
+		[{ color: [] }, { background: [] }, 'bold', 'italic', 'underline', 'strike'],
 		[{ align: '' }, { align: 'center' }, { align: 'right' }, { align: 'justify' }],
-		[{ list: 'ordered' }, { list: 'bullet' }, { indent: '+1' }, { indent: '-1' }, 'blockquote', 'code'],
+		[{ list: 'ordered' }, { list: 'bullet' }, { indent: '+1' }, { indent: '-1' }, 'blockquote'],
 		['link', 'image', 'video'],
-		['strike', { script: 'super' }, { script: 'sub' }, 'divider'],
+		[{ script: 'super' }, { script: 'sub' }, 'divider'],
 		['clean', 'undo', 'redo'],
 	]
 
@@ -77,8 +77,13 @@ div(id="modal-mask")
 				title.value = 'Записать запись'
 		}
 
-		tagsRef.value = [...props.tags] // клон тэгов делается потому что иначе делаются изменения в значениях стора
+		tagsRef.value = [...props.tags] // клон тэгов делается потому что иначе делаются изменения в значениях стораджа
+		// contentRef.value = new String(props.content)
+		// console.log(props.content)
 	})
+
+	let tagsRef = ref([])
+	const contentRef = ref(props.content || '')
 
 	const emits = defineEmits(['close', 'startLoading'])
 
@@ -95,7 +100,6 @@ div(id="modal-mask")
 	}
 
 	let chip = ref('')
-	let tagsRef = ref([])
 
 	const addChip = () => {
 		if (chip.value.trim().length) {
@@ -112,10 +116,10 @@ div(id="modal-mask")
 	}
 
 	const saveTopic = () => {
-		if (props.content.trim().length) {
+		if (contentRef.value.trim().length) {
 			const topic = {
 				aType: currentTopicType.value,
-				content: props.content,
+				content: contentRef.value, //props.content,
 				tags: tagsRef.value,
 			}
 

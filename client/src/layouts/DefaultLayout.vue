@@ -9,7 +9,7 @@ div(class="view-container")
 	.view-container {
 		width: 100vw;
 		min-height: 100vh;
-		background: url('./src/assets/starry-sky.jpg');
+		background: url('/starry-sky.jpg');
 		//position: relative;
 	}
 </style>
