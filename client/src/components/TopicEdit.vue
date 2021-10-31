@@ -9,7 +9,7 @@ div(id="modal-mask")
 		div(id="topic-tags")
 			ui-textfield(class="input" v-model="chip" @keypress.enter="addChip" placeholder="название метки")
 			ui-chips(:chips="tagsRef" type="input")
-				ui-chip(v-for="item in tagsRef" key="item" class="tag") {{ item }}
+				ui-chip(v-for="item in tagsRef" key="item" class="tag" @remove="removeChip(item)") {{ item }}
 		div(id="btn-group")
 			ui-button(class="save-btn" @click="saveTopic" raised) Сохранить
 			ui-button(class="cancel-btn" @click="emitClose") Отменить
@@ -76,6 +76,8 @@ div(id="modal-mask")
 			default:
 				title.value = 'Записать запись'
 		}
+
+		tagsRef.value = [...props.tags] // клон тэгов делается потому что иначе делаются изменения в значениях стора
 	})
 
 	const emits = defineEmits(['close', 'startLoading'])
@@ -93,7 +95,7 @@ div(id="modal-mask")
 	}
 
 	let chip = ref('')
-	let tagsRef = ref(props.tags)
+	let tagsRef = ref([])
 
 	const addChip = () => {
 		if (chip.value.trim().length) {
@@ -102,12 +104,19 @@ div(id="modal-mask")
 		}
 	}
 
+	const removeChip = chip => {
+		const ind = tagsRef.value.indexOf(chip)
+		if (ind >= 0) {
+			tagsRef.value.splice(ind, 1)
+		}
+	}
+
 	const saveTopic = () => {
 		if (props.content.trim().length) {
 			const topic = {
 				aType: currentTopicType.value,
 				content: props.content,
-				tags: props.tags,
+				tags: tagsRef.value,
 			}
 
 			let actionName = ''
