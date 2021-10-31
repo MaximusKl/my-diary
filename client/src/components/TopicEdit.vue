@@ -6,11 +6,11 @@ div(id="modal-mask")
 		div(id="topic-content")
 			ui-editor(:options='{scrollingContainer: "#topic-content"}' placeholder="Напиши что-нибудь..." :toolbar="toolbar" v-model="content" )
 		div(id="topic-tags")
-			ui-textfield(class="input" v-model="chip" @keypress.enter="addChip" placeholder="введите название метки")
+			ui-textfield(class="input" v-model="chip" @keypress.enter="addChip" placeholder="название метки")
 			ui-chips(:chips="tagsRef" type="input")
 				ui-chip(v-for="item in tagsRef" key="item" class="tag") {{ item }}
 		div(id="btn-group")
-			ui-button(class="save-btn" raised @click="addTopic") Сохранить
+			ui-button(class="save-btn" @click="saveTopic" raised) Сохранить
 			ui-button(class="cancel-btn" @click="emitClose") Отменить
 </template>
 
@@ -25,7 +25,7 @@ div(id="modal-mask")
 	// 	['clean', 'undo', 'redo'],
 	// 	['preview'], // custom
 	// ]
-	import { ref } from 'vue'
+	import { onMounted, ref } from 'vue'
 	import { useStore } from 'vuex'
 
 	const toolbar = [
@@ -39,14 +39,21 @@ div(id="modal-mask")
 	]
 
 	const props = defineProps({
-		title: {
+		action: {
 			type: String,
 			required: true,
 		},
+		// title: {
+		// 	type: String,
+		// 	required: true,
+		// },
 		// aType: {
 		// 	type: String,
 		// 	required: true,
 		// },
+		id: {
+			type: String,
+		},
 		content: {
 			type: String,
 			required: true,
@@ -57,7 +64,22 @@ div(id="modal-mask")
 		},
 	})
 
-	const emits = defineEmits(['close'])
+	let title = ref('')
+
+	onMounted(() => {
+		switch (props.action) {
+			case 'add':
+				title.value = 'Добавить запись'
+				break
+			case 'edit':
+				title.value = 'Изменить запись'
+				break
+			default:
+				title.value = 'Записать запись'
+		}
+	})
+
+	const emits = defineEmits(['close', 'startLoading'])
 
 	const emitClose = () => {
 		emits('close')
@@ -77,7 +99,7 @@ div(id="modal-mask")
 
 	const store = useStore()
 
-	const addTopic = () => {
+	const saveTopic = () => {
 		if (props.content.trim().length) {
 			const topic = {
 				// aType: '',
@@ -85,9 +107,26 @@ div(id="modal-mask")
 				tags: props.tags,
 			}
 
-			store.dispatch('addTopic', topic).then(() => {
+			let actionName = ''
+			switch (props.action) {
+				case 'add':
+					actionName = 'addTopic'
+					break
+				case 'edit':
+					actionName = 'editTopic'
+					topic._id = props.id
+					break
+				default:
+					alert('Не распознали действие')
+					return
+			}
+
+			emits('startLoading')
+			store.dispatch(actionName, topic).then(() => {
 				emitClose()
 			})
+		} else {
+			alert('Нет текста!')
 		}
 	}
 </script>
@@ -101,7 +140,6 @@ div(id="modal-mask")
 		width: 100%;
 		height: 100%;
 		background-color: rgba(0, 0, 0, 0.5);
-		//display: table;
 	}
 
 	#main-frame {
@@ -109,7 +147,7 @@ div(id="modal-mask")
 		flex-direction: column;
 		justify-content: space-between;
 		max-width: 560px;
-		//height: 300px;
+		width: 90%;
 		position: fixed;
 		left: 50%;
 		top: 50%;
@@ -119,7 +157,6 @@ div(id="modal-mask")
 	}
 
 	#title {
-		//height: 50px;
 		background-color: #cccccc;
 		line-height: 30px;
 		border-radius: 10px 0 0 0;
@@ -135,9 +172,6 @@ div(id="modal-mask")
 		overflow-y: auto;
 		max-height: 300px;
 		margin: 10px;
-	}
-
-	#topic-tags {
 	}
 
 	#btn-group {

@@ -3,10 +3,10 @@ div(class="topics-list-container")
 	div(class="topics-list-wrapper")
 		div(class="filter-bar")
 		div(class="topics-content" v-if="!isLoading")
-			topic(v-for="i in topics" key="i._id" :date="new Date(i.created)" :content="i.content" :tags="i.tags" :id="i._id" @remove="removeTopic")
-ui-fab(class="float-btn" @click="openModal")
+			topic(v-for="i in topics" key="i._id" :date="new Date(i.created)" :content="i.content" :tags="i.tags" :id="i._id" @remove="removeTopic" @edit="editTopic")
+ui-fab(class="float-btn" @click="addTopic")
 	ui-icon(class="black") add
-topic-edit(v-if="showModal" :title="modalTitle" @close="closeModal" :content="modalContent" :tags='modalTags' )
+topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true" :content="topicContent" :tags='topicTags' :action="modalAction" :id="topicId")
 </template>
 
 <script setup lang="ts">
@@ -31,22 +31,25 @@ topic-edit(v-if="showModal" :title="modalTitle" @close="closeModal" :content="mo
 
 	let showModal = ref(false)
 
-	let modalTitle = ref('')
-	let modalContent = ref('')
-	let modalTags = ref([])
+	let modalAction = ref('')
+	let topicId = ref('')
+	let topicContent = ref('')
+	let topicTags = ref([])
 
 	const clearModalForm = () => {
-		modalContent.value = ''
-		modalTags.value = []
+		topicId.value = ''
+		topicContent.value = ''
+		topicTags.value = []
 	}
 
 	const closeModal = () => {
 		showModal.value = false
+		isLoading.value = false
 		clearModalForm()
 	}
 
-	const openModal = () => {
-		modalTitle.value = 'Добавить запись'
+	const addTopic = () => {
+		modalAction.value = 'add'
 		showModal.value = true
 	}
 
@@ -56,6 +59,21 @@ topic-edit(v-if="showModal" :title="modalTitle" @close="closeModal" :content="mo
 		await store.dispatch('removeTopic', id).then(() => {
 			isLoading.value = false
 		})
+	}
+
+	const editTopic = async id => {
+		// Заполнить поля
+		const topic = store.getters.topic(id)
+		if (topic) {
+			modalAction.value = 'edit'
+			topicId.value = id
+			topicContent.value = topic.content
+			topicTags.value = topic.tags
+			showModal.value = true
+		} else {
+			console.log('Topic not found')
+		}
+		// showModal.value = true
 	}
 </script>
 

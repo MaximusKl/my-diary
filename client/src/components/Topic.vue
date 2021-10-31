@@ -1,7 +1,7 @@
 <template lang="pug">
 div(class="container")
 	div(class="topic-header")
-		ui-icon(class="header-icon") edit
+		ui-icon(class="header-icon" @click="editTopic") edit
 		div(class="date")  {{ dateFormatted }}
 		ui-icon(class="header-icon" @click="openConfirmation = true") close
 	div(class="content" v-html="content" )
@@ -45,7 +45,7 @@ ui-dialog(v-model="openConfirmation")
 		},
 	})
 
-	const emits = defineEmits(['remove'])
+	const emits = defineEmits(['remove', 'edit'])
 
 	const store = useStore()
 
@@ -54,6 +54,10 @@ ui-dialog(v-model="openConfirmation")
 	})
 
 	let openConfirmation = ref(false)
+
+	const editTopic = () => {
+		emits('edit', props.id)
+	}
 
 	const removeTopic = () => {
 		emits('remove', props.id)
