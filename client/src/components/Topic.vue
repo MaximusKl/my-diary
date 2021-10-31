@@ -4,8 +4,8 @@ div(class="container")
 		ui-icon(class="header-icon" @click="editTopic") edit
 		div(class="date")  {{ dateFormatted }}
 		ui-icon(class="header-icon" @click="openConfirmation = true") close
+	div(class="topic-type") {{ topicTypeName() }}
 	div(class="content" v-html="content" )
-	//div(class="tags") {{ tags }}
 	ui-chips(:chips="tags" class="tags")
 		ui-chip(v-for="item in tags" key="item" class="tag") {{ item }}
 ui-dialog(v-model="openConfirmation")
@@ -23,10 +23,10 @@ ui-dialog(v-model="openConfirmation")
 	import { useStore } from 'vuex'
 
 	const props = defineProps({
-		// aType: {
-		// 	type: String,
-		// 	required: true,
-		// },
+		aType: {
+			type: String,
+			required: true,
+		},
 		id: {
 			type: String,
 			required: true,
@@ -45,9 +45,9 @@ ui-dialog(v-model="openConfirmation")
 		},
 	})
 
-	const emits = defineEmits(['remove', 'edit'])
-
 	const store = useStore()
+
+	const emits = defineEmits(['remove', 'edit'])
 
 	const dateFormatted = computed(() => {
 		return dateFilter(props.date, 'datetime')
@@ -62,15 +62,14 @@ ui-dialog(v-model="openConfirmation")
 	const removeTopic = () => {
 		emits('remove', props.id)
 		openConfirmation.value = false
-		// return store.dispatch('removeTopic', props.id).then(() => {
-		// 	openConfirmation.value = false
-		// })
+	}
+
+	const topicTypeName = () => {
+		return store.getters.topicType(props.aType)?.localizedName || ''
 	}
 </script>
 
 <style scoped lang="scss">
-	//$bubble-editor-height: 10px;
-
 	.container {
 		border-radius: 10px 0 10px 10px;
 		//height: 100px;
@@ -99,6 +98,10 @@ ui-dialog(v-model="openConfirmation")
 		visibility: hidden;
 	}
 
+	.topic-type {
+		text-align: center;
+	}
+
 	.content {
 		//text-align: left;
 		padding: 10px 20px;
@@ -112,7 +115,6 @@ ui-dialog(v-model="openConfirmation")
 
 	.tags {
 		padding: 0 20px 10px 20px;
-		//justify-content: center;
 	}
 
 	.tag {

@@ -2,7 +2,8 @@
 div(id="modal-mask")
 	div(id="main-frame")
 		div(id="title") {{ title }}
-		div(id="topic-type") Тип записи
+		div(id="topic-type")
+			ui-select(id="topic-type-select" v-model="currentTopicType" :options="getTypesOptions()" outlined) Тип записи
 		div(id="topic-content")
 			ui-editor(:options='{scrollingContainer: "#topic-content"}' placeholder="Напиши что-нибудь..." :toolbar="toolbar" v-model="content" )
 		div(id="topic-tags")
@@ -28,6 +29,8 @@ div(id="modal-mask")
 	import { onMounted, ref } from 'vue'
 	import { useStore } from 'vuex'
 
+	const store = useStore()
+
 	const toolbar = [
 		[{ header: [false, 1, 2, 3, 4, 5, 6] }, { font: [] }, { size: [] }],
 		['bold', 'italic', 'underline', { color: [] }, { background: [] }],
@@ -43,14 +46,10 @@ div(id="modal-mask")
 			type: String,
 			required: true,
 		},
-		// title: {
-		// 	type: String,
-		// 	required: true,
-		// },
-		// aType: {
-		// 	type: String,
-		// 	required: true,
-		// },
+		aType: {
+			type: String,
+			required: true,
+		},
 		id: {
 			type: String,
 		},
@@ -85,24 +84,28 @@ div(id="modal-mask")
 		emits('close')
 	}
 
+	let currentTopicType = ref(props.aType)
+
+	const getTypesOptions = () => {
+		return store.getters.topicsTypes.map(topicType => {
+			return { label: topicType.localizedName, value: topicType._id }
+		})
+	}
+
 	let chip = ref('')
 	let tagsRef = ref(props.tags)
 
 	const addChip = () => {
 		if (chip.value.trim().length) {
-			// console.log('add chip: ' + chip.value)
 			tagsRef.value.push(chip.value)
-			// console.log('add chip: ' + props.tags)
 			chip.value = ''
 		}
 	}
 
-	const store = useStore()
-
 	const saveTopic = () => {
 		if (props.content.trim().length) {
 			const topic = {
-				// aType: '',
+				aType: currentTopicType.value,
 				content: props.content,
 				tags: props.tags,
 			}
@@ -164,8 +167,13 @@ div(id="modal-mask")
 	}
 
 	#topic-type {
+		width: 100%;
 		text-align: center;
-		line-height: 24px;
+		padding-top: 10px;
+
+		&-select {
+			width: 60%;
+		}
 	}
 
 	#topic-content {

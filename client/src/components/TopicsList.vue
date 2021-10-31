@@ -3,10 +3,10 @@ div(class="topics-list-container")
 	div(class="topics-list-wrapper")
 		div(class="filter-bar")
 		div(class="topics-content" v-if="!isLoading")
-			topic(v-for="i in topics" key="i._id" :date="new Date(i.created)" :content="i.content" :tags="i.tags" :id="i._id" @remove="removeTopic" @edit="editTopic")
+			topic(v-for="i in topics" key="i._id" :date="new Date(i.created)" :content="i.content" :tags="i.tags" :id="i._id" :a-type="i.aType || ''" @remove="removeTopic" @edit="editTopic")
 ui-fab(class="float-btn" @click="addTopic")
 	ui-icon(class="black") add
-topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true" :content="topicContent" :tags='topicTags' :action="modalAction" :id="topicId")
+topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true" :content="topicContent" :tags='topicTags' :action="modalAction" :id="topicId" :a-type="topicType || ''")
 </template>
 
 <script setup lang="ts">
@@ -24,8 +24,10 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 	let isLoading = ref(true) // Без этого удалеие будет с ошибами
 
 	onMounted(() => {
-		store.dispatch('loadTopics').then(() => {
-			isLoading.value = false
+		store.dispatch('loadTopicsTypes').then(() => {
+			store.dispatch('loadTopics').then(() => {
+				isLoading.value = false
+			})
 		})
 	})
 
@@ -33,11 +35,13 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 
 	let modalAction = ref('')
 	let topicId = ref('')
+	let topicType = ref('')
 	let topicContent = ref('')
 	let topicTags = ref([])
 
 	const clearModalForm = () => {
 		topicId.value = ''
+		topicType.value = ''
 		topicContent.value = ''
 		topicTags.value = []
 	}
@@ -55,25 +59,26 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 
 	const removeTopic = async id => {
 		isLoading.value = true
-		// console.log('confirm removing topic ' + id)
 		await store.dispatch('removeTopic', id).then(() => {
 			isLoading.value = false
 		})
 	}
 
 	const editTopic = async id => {
-		// Заполнить поля
+		// Получить запись по id
 		const topic = store.getters.topic(id)
 		if (topic) {
+			// Заполнить поля
 			modalAction.value = 'edit'
 			topicId.value = id
+			topicType.value = topic.aType
 			topicContent.value = topic.content
 			topicTags.value = topic.tags
+			// Открыть окно
 			showModal.value = true
 		} else {
 			console.log('Topic not found')
 		}
-		// showModal.value = true
 	}
 </script>
 
@@ -85,10 +90,8 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 	}
 
 	.topics-list-wrapper {
-		//min-width: 200px;
 		max-width: 800px;
 		border: 1px dotted dimgray;
-		//margin: 100px 60px 10px 60px;
 		margin-top: 80px;
 		height: calc(100vh - 110px);
 		background-color: rgba(255, 255, 255, 0.1);
@@ -100,7 +103,6 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 
 	.filter-bar {
 		height: 50px;
-		//border: 1px dotted white;
 		position: sticky;
 		top: 0;
 		background-color: lightskyblue;
