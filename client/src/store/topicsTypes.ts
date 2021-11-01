@@ -6,9 +6,9 @@ const mapNames = {
 }
 
 export default {
-	state: {
+	state: () => ({
 		topicsTypes: [],
-	},
+	}),
 	mutations: {
 		setTopicsTypes(state, topicsTypes) {
 			state.topicsTypes = topicsTypes.map(t => {

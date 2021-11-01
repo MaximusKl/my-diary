@@ -1,9 +1,9 @@
 import apiClient from '../api/axios'
 
 export default {
-	state: {
+	state: () => ({
 		token: null,
-	},
+	}),
 	mutations: {
 		setToken(state, token) {
 			state.token = token

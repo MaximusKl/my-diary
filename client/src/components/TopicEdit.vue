@@ -85,7 +85,7 @@ div(id="modal-mask")
 	let tagsRef = ref([])
 	const contentRef = ref(props.content || '')
 
-	const emits = defineEmits(['close', 'startLoading'])
+	const emits = defineEmits(['close'])
 
 	const emitClose = () => {
 		emits('close')
@@ -108,8 +108,8 @@ div(id="modal-mask")
 		}
 	}
 
-	const removeChip = chip => {
-		const ind = tagsRef.value.indexOf(chip)
+	const removeChip = aChip => {
+		const ind = tagsRef.value.indexOf(aChip)
 		if (ind >= 0) {
 			tagsRef.value.splice(ind, 1)
 		}
@@ -137,7 +137,7 @@ div(id="modal-mask")
 					return
 			}
 
-			emits('startLoading')
+			// emits('startLoading')
 			store.dispatch(actionName, topic).then(() => {
 				emitClose()
 			})

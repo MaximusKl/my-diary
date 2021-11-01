@@ -1,9 +1,10 @@
 import apiClient from '../api/axios'
+import moment from 'moment'
 
 export default {
-	state: {
+	state: () => ({
 		topics: [],
-	},
+	}),
 	mutations: {
 		setTopics(state, topics) {
 			state.topics = topics
@@ -92,7 +93,42 @@ export default {
 		},
 	},
 	getters: {
-		topics: s => s.topics,
+		topics: s => filter => {
+			const filteredTopics = s.topics.filter(topic => {
+				// console.log(filter.currentTopicType)
+				// По типу записи
+				const hasSuitableType = filter.currentTopicType === 'none' || filter.currentTopicType === topic.aType
+
+				// По тегам
+				let hasSuitableTag = true
+				if (filter.tags.length) {
+					hasSuitableTag = false
+					let tags = filter.tags.split(' ')
+					tags = tags.filter(tag => tag.trim().length)
+					for (const tag of tags) {
+						for (const topicTag of topic.tags) {
+							if (topicTag.indexOf(tag) !== -1) {
+								hasSuitableTag = true
+								break
+							}
+						}
+						if (hasSuitableTag) break
+					}
+				}
+
+				// По датам
+				let hasSuitableDate = true
+				if (filter.dateRange.length > 1 && filter.dateRange[0].length) {
+					const start = moment(filter.dateRange[0], 'DD-MM-YYYY')
+					const finish = moment(filter.dateRange[1], 'DD-MM-YYYY').add(1, 'day')
+					const created = moment(topic.created, 'YYYY-MM-DD')
+					hasSuitableDate = start <= created && created <= finish
+				}
+
+				return hasSuitableType && hasSuitableTag && hasSuitableDate
+			})
+			return filteredTopics
+		},
 		topic: s => id => {
 			return s.topics.find(topic => topic._id === id)
 		},

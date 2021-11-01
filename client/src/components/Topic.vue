@@ -6,7 +6,8 @@ div(class="container")
 		ui-icon(class="header-icon" @click="openConfirmation = true") close
 	div(class="topic-type") {{ topicTypeName() }}
 	div(class="content" v-html="content" )
-	ui-chips(:chips="tags" class="tags")
+	//ui-chips(:chips="chips" class="tags")
+	div(class="tags")
 		ui-chip(v-for="item in tags" key="item" class="tag") {{ item }}
 ui-dialog(v-model="openConfirmation")
 	ui-dialog-title Вы уверены?
@@ -50,7 +51,7 @@ ui-dialog(v-model="openConfirmation")
 	const emits = defineEmits(['remove', 'edit'])
 
 	const dateFormatted = computed(() => {
-		return dateFilter(props.date, 'datetime')
+		return dateFilter(new Date(props.date), 'datetime')
 	})
 
 	let openConfirmation = ref(false)
@@ -114,12 +115,17 @@ ui-dialog(v-model="openConfirmation")
 	}
 
 	.tags {
-		padding: 0 20px 10px 20px;
+		padding: 8px 20px 10px 10px;
 	}
 
 	.tag {
 		background-color: deepskyblue;
 		min-width: 50px;
 		justify-content: center;
+		margin-right: 6px;
+
+		&:last-child {
+			margin-right: 0;
+		}
 	}
 </style>

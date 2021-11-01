@@ -2,20 +2,20 @@
 div(class="topics-list-container")
 	div(class="topics-list-wrapper" v-if="!isLoading")
 		div(class="filter-bar")
-			ui-select(id="topics-type-select" v-model="currentTopicType" :options="getTypesOptions()" outlined) Тип записи
-			ui-textfield(id="topics-tags-filter" v-model="filterTags" outlined with-trailing-icon) Метка
+			ui-select(id="topics-type-select" v-model="filter.currentTopicType" :options="getTypesOptions()" outlined) Тип записи
+			ui-textfield(id="topics-tags-filter" v-model="filter.tags" outlined with-trailing-icon) Метка
 				template(#after)
-					ui-textfield-icon(v-if="filterTags" @click="cleanTagsFilter()" trailing) close
-			ui-datepicker(id="topics-range-filter" v-model="dateRange" :label="'Выбор дат'" :config="dateRangeOptions" @update:modelValue="dateRangeChange" outlined with-trailing-icon)
+					ui-textfield-icon(v-if="filter.tags" @click="cleanTagsFilter()" trailing) close
+			ui-datepicker(id="topics-range-filter" v-model="filter.dateRange" :label="'Выбор дат'" :config="dateRangeOptions" @update:modelValue="dateRangeChange" outlined with-trailing-icon)
 				template(#after)
 					ui-textfield-icon(v-if="thereIsDateRange()" @click="dateRangeClean()" trailing) close
 		div(class="topics-content")
-			topic(v-for="i in topics" key="i._id" :date="new Date(i.created)" :content="i.content" :tags="i.tags" :id="i._id" :a-type="i.aType || ''" @remove="removeTopic" @edit="editTopic")
+			topic(v-for="i in topics" key="i._id" :date="new Date(i.created)" :tags="i.tags" :content="i.content" :id="i._id" :a-type="i.aType || ''" @remove="removeTopic" @edit="editTopic")
 	div(class="spinner-container" v-else)
 		spinner
 ui-fab(class="float-btn" @click="addTopic")
 	ui-icon(class="black") add
-topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true" :content="topicContent" :tags='topicTags' :action="modalAction" :id="topicId" :a-type="topicType || ''")
+topic-edit(v-if="showModal" @close="closeModal" :content="topicContent" :tags='topicTags' :action="modalAction" :id="topicId" :a-type="topicType || ''")
 </template>
 
 <script setup lang="ts">
@@ -29,10 +29,10 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 	const store = useStore()
 
 	const topics = computed(() => {
-		return store.getters.topics
+		return store.getters.topics(filter.value)
 	})
 
-	let isLoading = ref(true) // Без этого удалеие будет с ошибами
+	const isLoading = ref(true) // Без этого удалеие будет с ошибами
 
 	onMounted(() => {
 		store.dispatch('loadTopicsTypes').then(() => {
@@ -42,13 +42,13 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 		})
 	})
 
-	let showModal = ref(false)
+	const showModal = ref(false)
 
-	let modalAction = ref('')
-	let topicId = ref('')
-	let topicType = ref('')
-	let topicContent = ref('')
-	let topicTags = ref([])
+	const modalAction = ref('')
+	const topicId = ref('')
+	const topicType = ref('')
+	const topicContent = ref('')
+	const topicTags = ref([])
 
 	const clearModalForm = () => {
 		topicId.value = ''
@@ -59,7 +59,7 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 
 	const closeModal = () => {
 		showModal.value = false
-		isLoading.value = false
+		// isLoading.value = false
 		clearModalForm()
 	}
 
@@ -69,9 +69,9 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 	}
 
 	const removeTopic = async id => {
-		isLoading.value = true
+		// isLoading.value = true
 		await store.dispatch('removeTopic', id).then(() => {
-			isLoading.value = false
+			// isLoading.value = false
 		})
 	}
 
@@ -92,22 +92,30 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 		}
 	}
 
-	let currentTopicType = ref('')
+	// Filter
+
+	const filter = ref({
+		currentTopicType: '',
+		tags: '',
+		dateRange: [''],
+	})
+
+	// const currentTopicType = ref('')
 
 	const getTypesOptions = () => {
 		const types = store.getters.topicsTypes.map(topicType => {
 			return { label: topicType.localizedName, value: topicType._id }
 		})
-		return [{ label: 'Все', value: -1 }, ...types]
+		return [{ label: 'Все', value: 'none' }, ...types]
 	}
 
-	const filterTags = ref('')
+	// const filterTags = ref('')
 
 	const cleanTagsFilter = () => {
-		filterTags.value = ''
+		filter.value.tags = ''
 	}
 
-	let dateRange = ref([''])
+	// const dateRange = ref([''])
 
 	const dateRangeOptions = {
 		dateFormat: 'd-m-Y',
@@ -118,17 +126,17 @@ topic-edit(v-if="showModal" @close="closeModal" @startLoading="isLoading = true"
 	}
 
 	const thereIsDateRange = () => {
-		return dateRange.value[0].length > 0
+		return filter.value.dateRange[0].length > 0
 	}
 
 	const dateRangeClean = () => {
-		dateRange.value = ['', '']
-		console.log('Date changed 2: ', dateRange.value)
+		filter.value.dateRange = ['', '']
+		console.log('Date changed 2: ', filter.value.dateRange)
 	}
 
 	const dateRangeChange = data => {
 		console.log('Date changed: ', data)
-		console.log('Date changed 2: ', dateRange.value)
+		console.log('Date changed 2: ', filter.value.dateRange)
 	}
 </script>
 
