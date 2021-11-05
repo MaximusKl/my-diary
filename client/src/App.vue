@@ -14,8 +14,13 @@ component(:is="layout")
 </script>
 
 <style lang="scss">
+	@font-face {
+		font-family: 'Montserrat';
+		src: local('Montserrat'), url(/fonts/Montserrat/Montserrat-Regular.ttf) format('truetype');
+	}
+
 	* {
-		font-family: Roboto, Avenir, Helvetica, Arial, sans-serif;
+		font-family: Montserrat, Arial, sans-serif;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 		//text-align: center;
