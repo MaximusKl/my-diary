@@ -6,11 +6,13 @@ div(class="topics-list-container")
 			ui-textfield(id="topics-tags-filter" v-model="filter.tags" outlined with-trailing-icon) Метка
 				template(#after)
 					ui-textfield-icon(v-if="filter.tags" @click="cleanTagsFilter()" trailing) close
-			ui-datepicker(id="topics-range-filter" v-model="filter.dateRange" :label="'Выбор дат'" :config="dateRangeOptions" @update:modelValue="dateRangeChange" outlined with-trailing-icon)
+			ui-datepicker(id="topics-range-filter" v-model="filter.dateRange" :label="'Выбор дат'" :config="dateRangeOptions" outlined with-trailing-icon)
 				template(#after)
 					ui-textfield-icon(v-if="thereIsDateRange()" @click="dateRangeClean()" trailing) close
-		div(class="topics-content")
-			topic(v-for="i in topics" key="i._id" :date="new Date(i.created)" :tags="i.tags" :content="i.content" :id="i._id" :a-type="i.aType || ''" @remove="removeTopic" @edit="editTopic")
+		div(class="topics-content" v-if="topics.length")
+			topic(v-for="i in topics" key="i._id" :date="new Date(i.created)" :tags="i.tags" :content="i.content" :id="i._id" :a-type="i.aType || ''" @remove="removeTopic" @edit="editTopic" @tagClick="tagClicked")
+		div(class="topics-empty-content" v-else)
+			p Ничего нет
 	div(class="spinner-container" v-else)
 		spinner
 ui-fab(class="float-btn" @click="addTopic")
@@ -34,12 +36,10 @@ topic-edit(v-if="showModal" @close="closeModal" :content="topicContent" :tags='t
 
 	const isLoading = ref(true) // Без этого удалеие будет с ошибами
 
-	onMounted(() => {
-		store.dispatch('loadTopicsTypes').then(() => {
-			store.dispatch('loadTopics').then(() => {
-				isLoading.value = false
-			})
-		})
+	onMounted(async () => {
+		await store.dispatch('loadTopicsTypes')
+		await store.dispatch('loadTopics')
+		isLoading.value = false
 	})
 
 	const showModal = ref(false)
@@ -131,12 +131,10 @@ topic-edit(v-if="showModal" @close="closeModal" :content="topicContent" :tags='t
 
 	const dateRangeClean = () => {
 		filter.value.dateRange = ['', '']
-		console.log('Date changed 2: ', filter.value.dateRange)
 	}
 
-	const dateRangeChange = data => {
-		console.log('Date changed: ', data)
-		console.log('Date changed 2: ', filter.value.dateRange)
+	const tagClicked = tag => {
+		filter.value.tags = tag
 	}
 </script>
 
@@ -157,6 +155,20 @@ topic-edit(v-if="showModal" @close="closeModal" :content="topicContent" :tags='t
 		position: relative;
 		left: 50%;
 		transform: translateX(-50%);
+	}
+
+	.topics-empty-content {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		height: calc(100% - 76px);
+
+		p {
+			font-size: 2rem;
+			display: block;
+			color: white;
+		}
 	}
 
 	.spinner-container {

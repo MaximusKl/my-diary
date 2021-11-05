@@ -8,7 +8,7 @@ div(class="container")
 	div(class="content" v-html="content" )
 	//ui-chips(:chips="chips" class="tags")
 	div(class="tags")
-		ui-chip(v-for="item in tags" key="item" class="tag") {{ item }}
+		ui-chip(v-for="item in tags" key="item" class="tag" @click="tagClick") {{ item }}
 ui-dialog(v-model="openConfirmation")
 	ui-dialog-title Вы уверены?
 	ui-dialog-content
@@ -48,7 +48,7 @@ ui-dialog(v-model="openConfirmation")
 
 	const store = useStore()
 
-	const emits = defineEmits(['remove', 'edit'])
+	const emits = defineEmits(['remove', 'edit', 'tagClick'])
 
 	const dateFormatted = computed(() => {
 		return dateFilter(new Date(props.date), 'datetime')
@@ -67,6 +67,16 @@ ui-dialog(v-model="openConfirmation")
 
 	const topicTypeName = () => {
 		return store.getters.topicType(props.aType)?.localizedName || ''
+	}
+
+	const tagClick = e => {
+		let el = e.target
+		if (el.nodeName === 'DIV') {
+			el = el.querySelector('.mdc-chip__text')
+		}
+		if (el) {
+			emits('tagClick', el.textContent)
+		}
 	}
 </script>
 
@@ -97,6 +107,7 @@ ui-dialog(v-model="openConfirmation")
 	.header-icon {
 		cursor: pointer;
 		visibility: hidden;
+		transition: all ease 0.1s;
 	}
 
 	.topic-type {
