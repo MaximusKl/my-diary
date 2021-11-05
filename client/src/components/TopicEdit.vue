@@ -10,6 +10,8 @@ div(id="modal-mask")
 			ui-textfield(class="input" v-model="chip" @keypress.enter="addChip" placeholder="название метки")
 			ui-chips(:chips="tagsRef" type="input")
 				ui-chip(v-for="item in tagsRef" key="item" class="tag" @remove="removeChip(item)") {{ item }}
+		div(v-if="errorMessage.length" class="error-container")
+			p(class="error") {{ errorMessage }}
 		div(id="btn-group")
 			ui-button(class="save-btn" @click="saveTopic" raised) Сохранить
 			ui-button(class="cancel-btn" @click="emitClose") Отменить
@@ -64,6 +66,7 @@ div(id="modal-mask")
 	})
 
 	let title = ref('')
+	let errorMessage = ref('')
 
 	onMounted(() => {
 		switch (props.action) {
@@ -78,8 +81,6 @@ div(id="modal-mask")
 		}
 
 		tagsRef.value = [...props.tags] // клон тэгов делается потому что иначе делаются изменения в значениях стораджа
-		// contentRef.value = new String(props.content)
-		// console.log(props.content)
 	})
 
 	let tagsRef = ref([])
@@ -94,7 +95,7 @@ div(id="modal-mask")
 	let currentTopicType = ref(props.aType)
 
 	const getTypesOptions = () => {
-		return store.getters.topicsTypes.map(topicType => {
+		return store.getters['topicsTypes/topicsTypes'].map(topicType => {
 			return { label: topicType.localizedName, value: topicType._id }
 		})
 	}
@@ -133,16 +134,20 @@ div(id="modal-mask")
 					topic._id = props.id
 					break
 				default:
-					alert('Не распознали действие')
+					errorMessage.value = `Ошибка! Не распознали действие`
 					return
 			}
 
-			// emits('startLoading')
-			store.dispatch(actionName, topic).then(() => {
-				emitClose()
-			})
+			store
+				.dispatch(actionName, topic)
+				.then(() => {
+					emitClose()
+				})
+				.catch(e => {
+					errorMessage.value = `Ошибка! ${e.message}`
+				})
 		} else {
-			alert('Нет текста!')
+			errorMessage.value = `Нет текста записи!`
 		}
 	}
 </script>
@@ -217,5 +222,13 @@ div(id="modal-mask")
 		height: 40px;
 		width: calc(100% - 20px);
 		margin-left: 10px;
+	}
+
+	.error-container {
+		text-align: center;
+	}
+
+	.error {
+		color: red;
 	}
 </style>

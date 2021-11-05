@@ -1,8 +1,16 @@
 import apiClient from '../api/axios'
 
+const errorLocalizations = {
+	'no login data': 'Заполните поля',
+	'wrong login data': 'Неправильные данные для входа',
+	'user not found': 'Пользователь не найден',
+}
+
 export default {
+	namespaced: true,
 	state: () => ({
 		token: null,
+		error: null,
 	}),
 	mutations: {
 		setToken(state, token) {
@@ -13,6 +21,9 @@ export default {
 				localStorage.setItem('AuthToken', token)
 			}
 		},
+		setError(state, message) {
+			state.error = message
+		},
 	},
 	actions: {
 		async login({ commit }, user) {
@@ -20,12 +31,10 @@ export default {
 				const res = await apiClient.post('/auth/login', JSON.stringify(user))
 				if (res.status >= 200 && res.status < 300) {
 					const result = res.data
-					// console.log(`Result: ${result.token}`)
 					commit('setToken', result.token)
 				} else {
-					console.log(`Error: ${res.status}`)
 					const result = res.data
-					console.log(`Error: ${result.message}`)
+					commit('setError', result.message)
 				}
 			} catch (e) {
 				console.log(e)
@@ -34,9 +43,15 @@ export default {
 		logout({ commit }) {
 			commit('setToken', null)
 		},
+		setError({ commit }, message) {
+			commit('setError', message)
+		},
 	},
 	getters: {
 		token: s => s.token,
 		isLoggedIn: s => s.token !== null,
+		error: s => {
+			return errorLocalizations[s.error] || s.error
+		},
 	},
 }

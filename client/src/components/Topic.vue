@@ -66,7 +66,7 @@ ui-dialog(v-model="openConfirmation")
 	}
 
 	const topicTypeName = () => {
-		return store.getters.topicType(props.aType)?.localizedName || ''
+		return store.getters['topicsTypes/topicType'](props.aType)?.localizedName || ''
 	}
 
 	const tagClick = e => {

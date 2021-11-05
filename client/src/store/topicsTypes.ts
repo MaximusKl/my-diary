@@ -6,6 +6,7 @@ const mapNames = {
 }
 
 export default {
+	namespaced: true,
 	state: () => ({
 		topicsTypes: [],
 	}),
@@ -22,15 +23,14 @@ export default {
 				const res = await apiClient.get('/record-type')
 				if (res.status >= 200 && res.status < 300) {
 					const result = res.data
-					// console.log(`Result: ${JSON.stringify(result)}`)
 					commit('setTopicsTypes', result)
 				} else {
-					console.log(`Error: ${res.status}`)
 					const result = res.data
-					console.log(`Error: ${result.message}`)
+					throw result.message
 				}
 			} catch (e) {
 				console.log(e)
+				throw e
 			}
 		},
 	},

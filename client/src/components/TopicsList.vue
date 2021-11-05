@@ -18,6 +18,7 @@ div(class="topics-list-container")
 ui-fab(class="float-btn" @click="addTopic")
 	ui-icon(class="black") add
 topic-edit(v-if="showModal" @close="closeModal" :content="topicContent" :tags='topicTags' :action="modalAction" :id="topicId" :a-type="topicType || ''")
+ui-snackbar(v-model="openSnackbar" :timeout-ms="5000" :message="snackBarMessage" action-button-text="close" :action-type="1" position="top")
 </template>
 
 <script setup lang="ts">
@@ -37,8 +38,12 @@ topic-edit(v-if="showModal" @close="closeModal" :content="topicContent" :tags='t
 	const isLoading = ref(true) // Без этого удалеие будет с ошибами
 
 	onMounted(async () => {
-		await store.dispatch('loadTopicsTypes')
-		await store.dispatch('loadTopics')
+		try {
+			await store.dispatch('topicsTypes/loadTopicsTypes')
+			await store.dispatch('loadTopics')
+		} catch (e) {
+			showSnackbarMessage(`Ошибка! ${e.message}`)
+		}
 		isLoading.value = false
 	})
 
@@ -63,16 +68,29 @@ topic-edit(v-if="showModal" @close="closeModal" :content="topicContent" :tags='t
 		clearModalForm()
 	}
 
+	const openSnackbar = ref(false)
+
+	const snackBarMessage = ref('')
+
+	const showSnackbarMessage = message => {
+		snackBarMessage.value = message
+		openSnackbar.value = true
+	}
+
 	const addTopic = () => {
 		modalAction.value = 'add'
 		showModal.value = true
 	}
 
-	const removeTopic = async id => {
-		// isLoading.value = true
-		await store.dispatch('removeTopic', id).then(() => {
-			// isLoading.value = false
-		})
+	const removeTopic = id => {
+		store
+			.dispatch('removeTopic', id)
+			.then(() => {
+				showSnackbarMessage('Запись удалена')
+			})
+			.catch(e => {
+				showSnackbarMessage(e.message)
+			})
 	}
 
 	const editTopic = async id => {
@@ -88,7 +106,8 @@ topic-edit(v-if="showModal" @close="closeModal" :content="topicContent" :tags='t
 			// Открыть окно
 			showModal.value = true
 		} else {
-			console.log('Topic not found')
+			// console.log('Topic not found')
+			showSnackbarMessage('Запись не найдена')
 		}
 	}
 
@@ -103,7 +122,7 @@ topic-edit(v-if="showModal" @close="closeModal" :content="topicContent" :tags='t
 	// const currentTopicType = ref('')
 
 	const getTypesOptions = () => {
-		const types = store.getters.topicsTypes.map(topicType => {
+		const types = store.getters['topicsTypes/topicsTypes'].map(topicType => {
 			return { label: topicType.localizedName, value: topicType._id }
 		})
 		return [{ label: 'Все', value: 'none' }, ...types]
