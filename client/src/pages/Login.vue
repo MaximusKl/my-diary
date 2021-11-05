@@ -4,8 +4,8 @@ ui-form(class="login-form")
 	div(v-if="store.getters['auth/error']" class="error")
 		p {{ store.getters['auth/error'] }}
 	div
-		ui-textfield(class="mt-20 input" v-model="email" @keypress.enter="login") email address
-		ui-textfield(class="mt-20 input" v-model="password" input-type="password" @keypress.enter="login") password
+		ui-textfield(class="mt-20 input" v-model="email" input-type="email" @keypress.enter="login") Адрес электронной почты
+		ui-textfield(class="mt-20 input" v-model="password" input-type="password" @keypress.enter="login") Пароль
 	ui-button(class="mt-20 btn" raised @click="login" ) Войти
 </template>
 
@@ -39,7 +39,8 @@ ui-form(class="login-form")
 	.login-form {
 		display: flex;
 		flex-direction: column;
-		width: 400px;
+		max-width: 400px;
+		width: 90%;
 		//height: 230px;
 		background-color: white;
 		position: relative;
