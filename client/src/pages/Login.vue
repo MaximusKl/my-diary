@@ -6,7 +6,7 @@ ui-form(class="login-form")
 	div
 		ui-textfield(class="mt-20 input" v-model="email" input-type="email" @keypress.enter="login") Адрес электронной почты
 		ui-textfield(class="mt-20 input" v-model="password" input-type="password" @keypress.enter="login") Пароль
-	ui-button(class="mt-20 btn" raised @click="login" ) Войти
+	ui-button(:disabled="!email.trim().length || !password.trim().length" class="mt-20 btn" raised @click="login") Войти
 </template>
 
 <script setup lang="ts">
