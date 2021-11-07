@@ -3,9 +3,13 @@ div(class="topics-list-container")
 	div(class="topics-list-wrapper" v-if="!isLoading")
 		div(class="filter-bar")
 			ui-select(id="topics-type-select" v-model="filter.currentTopicType" :options="getTypesOptions()" outlined) Тип записи
-			ui-textfield(id="topics-tags-filter" v-model="filter.tags" outlined with-trailing-icon) Метка
-				template(#after)
-					ui-textfield-icon(v-if="filter.tags" @click="cleanTagsFilter()" trailing) close
+			ui-tooltip-anchor
+				ui-textfield(id="topics-tags-filter" v-model="filter.tags" aria-describedby="tags-tooltip" data-tooltip-id="tags-tooltip" outlined with-trailing-icon) Метка
+					template(#after)
+						ui-textfield-icon(v-if="filter.tags" @click="cleanTagsFilter()" trailing) close
+				ui-tooltip(id="tags-tooltip" rich)
+					template(#title) Подсказка
+					template(#default) Введите метки через запятую
 			ui-datepicker(id="topics-range-filter" v-model="filter.dateRange" :label="'Выбор дат'" :config="dateRangeOptions" outlined with-trailing-icon)
 				template(#after)
 					ui-textfield-icon(v-if="thereIsDateRange()" @click="dateRangeClean()" trailing) close
@@ -243,5 +247,13 @@ ui-snackbar(v-model="openSnackbar" :timeout-ms="5000" :message="snackBarMessage"
 	#topics-range-filter {
 		width: 280px;
 		margin: 5px;
+	}
+
+	#tags-tooltip {
+		//position: absolute;
+		//left: inherit;
+		//top: inherit;
+		//transform: translate(-150px, -86px);
+		z-index: 999;
 	}
 </style>

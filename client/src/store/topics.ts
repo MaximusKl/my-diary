@@ -93,11 +93,12 @@ export default {
 				let hasSuitableTag = true
 				if (filter.tags.length) {
 					hasSuitableTag = false
-					let tags = filter.tags.split(' ')
+					let tags = filter.tags.split(',')
 					tags = tags.filter(tag => tag.trim().length)
 					for (const tag of tags) {
 						for (const topicTag of topic.tags) {
-							if (topicTag.indexOf(tag) !== -1) {
+							// if (topicTag.indexOf(tag) !== -1) {
+							if (topicTag.trim().toLowerCase() === tag.trim().toLowerCase()) {
 								hasSuitableTag = true
 								break
 							}
